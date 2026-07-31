@@ -1,4 +1,4 @@
-# Zen Cleaner
+# Zen Tabs Cleaner
 
 Extension for [Zen Browser](https://zen-browser.app) that brings Arc's
 auto-archive feature: **unpinned** tabs inactive for **X hours** (configurable)

@@ -13,8 +13,9 @@
 ## Updates
 
 ⚠️ "Submit a New Add-on" is only for the very first submission — reusing it
-fails with "Duplicate add-on ID found", because the `zen-cleaner@qskkk` ID is
-already registered.
+fails with "Duplicate add-on ID found", because the add-on ID is already
+registered. Note: AMO reserves deleted add-on IDs forever, which is why the
+ID was changed from `zen-cleaner@qskkk` to `zen_tabs_cleaner@qskkk`.
 
 For every new version: bump `version` in `manifest.json` →
 `npx web-ext build` → https://addons.mozilla.org/developers/addons →
@@ -31,7 +32,7 @@ npx web-ext sign --channel=listed \
 ## Ready-to-paste listing texts
 
 ### Name
-Zen Cleaner
+Zen Tabs Cleaner
 
 ### Summary (max 250 characters)
 Automatically closes unpinned tabs that have been inactive for a set number
@@ -39,7 +40,7 @@ of hours, like Arc's auto-archive. Pinned tabs, Essentials, audible tabs and
 excluded domains are never touched. One-click restore after each cleanup.
 
 ### Description
-Zen Cleaner brings Arc's auto-archive to Zen Browser and Firefox.
+Zen Tabs Cleaner brings Arc's auto-archive to Zen Browser and Firefox.
 
 Every 15 minutes, it closes tabs that meet ALL of these conditions:
 • not pinned (pinned tabs and Zen Essentials are never touched)

@@ -67,7 +67,7 @@ async function cleanTabs(manual = false) {
   await browser.notifications.create(NOTIFICATION_ID, {
     type: "basic",
     iconUrl: browser.runtime.getURL("icons/icon.svg"),
-    title: "Zen Cleaner",
+    title: "Zen Tabs Cleaner",
     message:
       toClose.length === 1
         ? "1 inactive tab closed — click to restore it."
