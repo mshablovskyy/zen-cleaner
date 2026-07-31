@@ -55,7 +55,7 @@ function spareReason(tab, settings, now, thresholdMs, manual) {
 
 // manual === true: triggered from the popup — bypasses the inactivity
 // threshold and pause mode, but still spares pinned/active/audible/excluded tabs.
-async function cleanTabs(manual = false) {
+async function cleanTabs(manual = false, source = "alarm") {
   const settings = await getSettings();
   if (!settings.enabled && !manual) {
     return 0;
@@ -86,7 +86,7 @@ async function cleanTabs(manual = false) {
 
   const hiddenCount = tabs.filter((tab) => tab.hidden).length;
   console.debug(
-    `[Zen Tabs Cleaner] ${manual ? "manual" : "auto"} check: ` +
+    `[Zen Tabs Cleaner] ${manual ? "manual" : source} check: ` +
       `${tabs.length} tabs seen (${hiddenCount} hidden), closing ${toClose.length}`,
   );
   if (sparedReport.length > 0) {
@@ -177,7 +177,7 @@ function onActivity() {
     return;
   }
   lastActivityCheck = now;
-  cleanTabs(false).catch(console.error);
+  cleanTabs(false, "activity").catch(console.error);
 }
 
 browser.tabs.onActivated.addListener(onActivity);
