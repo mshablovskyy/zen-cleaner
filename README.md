@@ -6,8 +6,8 @@ are closed automatically.
 
 ## How it works
 
-Every 15 minutes, the extension checks each tab and closes those that meet
-**all** of these conditions:
+At a configurable interval (every 15 minutes by default), the extension
+checks each tab and closes those that meet **all** of these conditions:
 
 - not pinned (pinned tabs and Zen **Essentials** are never touched);
 - not the active tab of a window;
@@ -29,8 +29,9 @@ After each cleanup, a notification shows how many tabs were closed —
   (closes every unpinned/inactive/non-audible tab without waiting for the
   threshold), restore the last cleanup, open settings.
 - **Settings**: inactivity threshold in hours (1 h / 6 h / 12 h / 24 h presets,
-  decimals accepted — `0.05` ≈ 3 min, handy for testing) and excluded domains
-  list (one per line, subdomains included).
+  decimals accepted — `0.05` ≈ 3 min, handy for testing), check frequency in
+  minutes (1 min minimum, 15 min default), and excluded domains list (one per
+  line, subdomains included).
 
 ## Installing in Zen
 

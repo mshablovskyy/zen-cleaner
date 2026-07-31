@@ -1,7 +1,6 @@
 "use strict";
 
 const ALARM_NAME = "zen-cleaner-check";
-const CHECK_PERIOD_MINUTES = 15;
 const NOTIFICATION_ID = "zen-cleaner-cleanup";
 
 async function getSettings() {
@@ -100,12 +99,20 @@ async function restoreLastCleanup() {
   return restored;
 }
 
-function ensureAlarm() {
-  browser.alarms.create(ALARM_NAME, { periodInMinutes: CHECK_PERIOD_MINUTES });
+async function ensureAlarm() {
+  const settings = await getSettings();
+  const period = Math.max(1, Number(settings.checkPeriodMinutes) || 15);
+  browser.alarms.create(ALARM_NAME, { periodInMinutes: period });
 }
 
 browser.runtime.onInstalled.addListener(ensureAlarm);
 browser.runtime.onStartup.addListener(ensureAlarm);
+
+browser.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.checkPeriodMinutes) {
+    ensureAlarm();
+  }
+});
 
 browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) {

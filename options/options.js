@@ -1,9 +1,11 @@
 "use strict";
 
 const thresholdInput = document.getElementById("threshold");
+const checkPeriodInput = document.getElementById("check-period");
 const domainsTextarea = document.getElementById("excluded-domains");
 const savedIndicator = document.getElementById("saved-indicator");
-const presetButtons = document.querySelectorAll(".presets button");
+const thresholdPresets = document.querySelectorAll("#threshold-presets button");
+const periodPresets = document.querySelectorAll("#period-presets button");
 
 let savedTimeout;
 function showSaved() {
@@ -17,6 +19,7 @@ function showSaved() {
 async function load() {
   const settings = await browser.storage.local.get(DEFAULTS);
   thresholdInput.value = settings.thresholdHours;
+  checkPeriodInput.value = settings.checkPeriodMinutes;
   domainsTextarea.value = settings.excludedDomains.join("\n");
 }
 
@@ -26,14 +29,31 @@ function saveThreshold(hours) {
   browser.storage.local.set({ thresholdHours: value }).then(showSaved);
 }
 
+function saveCheckPeriod(minutes) {
+  const value = Math.round(Number(minutes));
+  if (!Number.isFinite(value) || value < 1) return;
+  checkPeriodInput.value = value;
+  browser.storage.local.set({ checkPeriodMinutes: value }).then(showSaved);
+}
+
 thresholdInput.addEventListener("change", () => {
   saveThreshold(thresholdInput.value);
 });
 
-presetButtons.forEach((button) => {
+checkPeriodInput.addEventListener("change", () => {
+  saveCheckPeriod(checkPeriodInput.value);
+});
+
+thresholdPresets.forEach((button) => {
   button.addEventListener("click", () => {
     thresholdInput.value = button.dataset.hours;
     saveThreshold(button.dataset.hours);
+  });
+});
+
+periodPresets.forEach((button) => {
+  button.addEventListener("click", () => {
+    saveCheckPeriod(button.dataset.minutes);
   });
 });
 

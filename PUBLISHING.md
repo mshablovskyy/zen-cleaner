@@ -42,7 +42,8 @@ excluded domains are never touched. One-click restore after each cleanup.
 ### Description
 Zen Tabs Cleaner brings Arc's auto-archive to Zen Browser and Firefox.
 
-Every 15 minutes, it closes tabs that meet ALL of these conditions:
+At a configurable interval (15 minutes by default), it checks each tab's
+last activity and closes tabs that meet ALL of these conditions:
 • not pinned (pinned tabs and Zen Essentials are never touched)
 • not the active tab of a window
 • not playing audio (music, video calls…)
@@ -58,6 +59,7 @@ Extras:
 • "Clean now" button in the popup (with confirmation)
 • Pause toggle to suspend cleaning temporarily
 • Configurable threshold with 1h / 6h / 12h / 24h presets
+• Configurable check frequency (1 minute minimum)
 • Domain exclusion list (subdomains included)
 
 No data collection, no external requests. Open source (MIT):
