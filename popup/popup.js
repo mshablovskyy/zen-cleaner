@@ -40,7 +40,10 @@ async function refresh() {
   renderLastCleanup(settings.lastCleanup);
 
   const stats = await browser.runtime.sendMessage({ type: "getStats" });
-  let text = `Watching ${stats.total} tabs (${stats.hidden} in other spaces)`;
+  let text = `Watching ${stats.total} tabs`;
+  if (stats.hidden > 0) {
+    text += ` (${stats.hidden} hidden)`;
+  }
   if (stats.eligible > 0) {
     text += ` — ${stats.eligible} overdue`;
   }

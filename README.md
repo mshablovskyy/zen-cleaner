@@ -15,13 +15,20 @@ checks each tab and closes those that meet **all** of these conditions:
 - not on a domain from the exclusion list;
 - inactive for longer than the configured threshold (12 hours by default).
 
-Tabs in **other Zen workspaces** are cleaned too (like Arc's spaces).
-
 After each cleanup, a notification shows how many tabs were closed —
 **clicking it restores them**. Restore is also available from the popup.
 
-> Limitation: restored tabs reopen in the current workspace, as the
-> WebExtensions API cannot target a specific Zen workspace.
+### Zen workspaces (spaces)
+
+Current Zen versions only expose the **active space's tabs** to extensions —
+tabs in other spaces are invisible to the WebExtensions API (not even as
+hidden tabs), so no extension can close them while you are elsewhere. To
+compensate, a cleanup check also runs **as soon as you switch space, tab or
+window** (throttled to once per 30 s): overdue tabs in a space are closed the
+moment you come back to it.
+
+> Other limitation: restored tabs reopen in the current space, as the
+> WebExtensions API cannot target a specific Zen space.
 
 ## Usage
 

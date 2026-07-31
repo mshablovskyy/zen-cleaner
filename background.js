@@ -164,6 +164,26 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
+// Zen only exposes the current space's tabs to extensions (no hidden tabs, no
+// separate windows), so overdue tabs in another space can only be cleaned once
+// that space becomes visible. Run an extra check whenever the user switches
+// tab or window — throttled, so space switches trigger it almost immediately
+// without re-checking on every tab hop.
+const ACTIVITY_CHECK_THROTTLE_MS = 30 * 1000;
+let lastActivityCheck = 0;
+
+function onActivity() {
+  const now = Date.now();
+  if (now - lastActivityCheck < ACTIVITY_CHECK_THROTTLE_MS) {
+    return;
+  }
+  lastActivityCheck = now;
+  cleanTabs(false).catch(console.error);
+}
+
+browser.tabs.onActivated.addListener(onActivity);
+browser.windows.onFocusChanged.addListener(onActivity);
+
 browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) {
     cleanTabs(false).catch(console.error);

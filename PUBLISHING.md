@@ -50,7 +50,9 @@ last activity and closes tabs that meet ALL of these conditions:
 • not on a domain from your exclusion list
 • inactive for longer than your threshold (12 hours by default)
 
-Tabs hidden in other Zen workspaces are cleaned too, just like Arc's spaces.
+Zen only exposes the active space's tabs to extensions, so tabs in other
+spaces are cleaned as soon as you switch back to them — a check also runs on
+every space/tab/window switch, not just on the periodic schedule.
 
 After each cleanup, a notification tells you how many tabs were closed —
 click it to restore them all. You can also restore from the popup.
