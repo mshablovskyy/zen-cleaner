@@ -20,6 +20,39 @@ function isExcluded(url, excludedDomains) {
   });
 }
 
+// Zen patches tabs.query in non-standard ways: the unfiltered path can fail or
+// drop hidden (other-workspace) tabs (zen-browser/desktop#11210, #12652).
+// Filtered queries still work, so query visible and hidden tabs separately.
+async function queryAllTabs() {
+  const tabs = [];
+  for (const filter of [{ hidden: false }, { hidden: true }]) {
+    try {
+      tabs.push(...(await browser.tabs.query(filter)));
+    } catch (error) {
+      console.error("[Zen Tabs Cleaner] tabs.query failed for", filter, error);
+    }
+  }
+  if (tabs.length === 0) {
+    tabs.push(...(await browser.tabs.query({})));
+  }
+  const seen = new Set();
+  return tabs.filter((tab) => !seen.has(tab.id) && seen.add(tab.id));
+}
+
+// Returns why a tab must be spared, or null if it can be closed.
+function spareReason(tab, settings, now, thresholdMs, manual) {
+  if (tab.pinned) return "pinned";
+  if (tab.active) return "active";
+  if (tab.audible) return "audible";
+  if (isExcluded(tab.url, settings.excludedDomains)) return "excluded";
+  if (!manual) {
+    // No lastAccessed = inactivity cannot be judged: keep the tab.
+    if (typeof tab.lastAccessed !== "number") return "no lastAccessed";
+    if (now - tab.lastAccessed <= thresholdMs) return "recent";
+  }
+  return null;
+}
+
 // manual === true: triggered from the popup — bypasses the inactivity
 // threshold and pause mode, but still spares pinned/active/audible/excluded tabs.
 async function cleanTabs(manual = false) {
@@ -30,18 +63,35 @@ async function cleanTabs(manual = false) {
 
   const thresholdMs = settings.thresholdHours * 3600 * 1000;
   const now = Date.now();
-  const tabs = await browser.tabs.query({});
+  const tabs = await queryAllTabs();
 
-  const toClose = tabs.filter((tab) => {
-    if (tab.pinned || tab.active || tab.audible) return false;
-    if (isExcluded(tab.url, settings.excludedDomains)) return false;
-    if (!manual) {
-      // No lastAccessed = inactivity cannot be judged: keep the tab.
-      if (typeof tab.lastAccessed !== "number") return false;
-      if (now - tab.lastAccessed <= thresholdMs) return false;
+  const toClose = [];
+  const sparedReport = [];
+  for (const tab of tabs) {
+    const reason = spareReason(tab, settings, now, thresholdMs, manual);
+    if (reason === null) {
+      toClose.push(tab);
+    } else {
+      sparedReport.push({
+        title: (tab.title || tab.url || "").slice(0, 50),
+        hidden: tab.hidden,
+        inactiveMin:
+          typeof tab.lastAccessed === "number"
+            ? Math.round((now - tab.lastAccessed) / 60000)
+            : null,
+        spared: reason,
+      });
     }
-    return true;
-  });
+  }
+
+  const hiddenCount = tabs.filter((tab) => tab.hidden).length;
+  console.debug(
+    `[Zen Tabs Cleaner] ${manual ? "manual" : "auto"} check: ` +
+      `${tabs.length} tabs seen (${hiddenCount} hidden), closing ${toClose.length}`,
+  );
+  if (sparedReport.length > 0) {
+    console.debug("[Zen Tabs Cleaner] spared tabs:", sparedReport);
+  }
 
   // Close tabs one by one: a tab closed by the user in the meantime must not
   // abort the whole cleanup, and lastCleanup must only list actually closed tabs.
@@ -127,12 +177,28 @@ browser.notifications.onClicked.addListener((notificationId) => {
   }
 });
 
+async function getStats() {
+  const settings = await getSettings();
+  const thresholdMs = settings.thresholdHours * 3600 * 1000;
+  const now = Date.now();
+  const tabs = await queryAllTabs();
+  return {
+    total: tabs.length,
+    hidden: tabs.filter((tab) => tab.hidden).length,
+    eligible: tabs.filter(
+      (tab) => spareReason(tab, settings, now, thresholdMs, false) === null,
+    ).length,
+  };
+}
+
 browser.runtime.onMessage.addListener(async (message) => {
   switch (message?.type) {
     case "cleanNow":
       return { closed: await cleanTabs(true) };
     case "restore":
       return { restored: await restoreLastCleanup() };
+    case "getStats":
+      return getStats();
     default:
       return undefined;
   }

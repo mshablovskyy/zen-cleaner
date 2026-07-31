@@ -2,6 +2,7 @@
 
 const enabledInput = document.getElementById("enabled");
 const thresholdHint = document.getElementById("threshold-hint");
+const statsLine = document.getElementById("stats");
 const cleanNowButton = document.getElementById("clean-now");
 const lastCleanupRow = document.getElementById("last-cleanup");
 const lastCleanupLabel = document.getElementById("last-cleanup-label");
@@ -37,6 +38,13 @@ async function refresh() {
   enabledInput.checked = settings.enabled;
   thresholdHint.textContent = `Closes unpinned tabs inactive for ${formatThreshold(settings.thresholdHours)}.`;
   renderLastCleanup(settings.lastCleanup);
+
+  const stats = await browser.runtime.sendMessage({ type: "getStats" });
+  let text = `Watching ${stats.total} tabs (${stats.hidden} in other spaces)`;
+  if (stats.eligible > 0) {
+    text += ` — ${stats.eligible} overdue`;
+  }
+  statsLine.textContent = text + ".";
 }
 
 enabledInput.addEventListener("change", () => {

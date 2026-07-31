@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Zen Tabs Cleaner",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Automatically closes unpinned tabs inactive for a configurable number of hours, like Arc's auto-archive feature.",
   "browser_specific_settings": {
     "gecko": {
