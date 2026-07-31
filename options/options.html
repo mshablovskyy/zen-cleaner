@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Zen Cleaner — Réglages</title>
+  <title>Zen Cleaner — Settings</title>
   <link rel="stylesheet" href="options.css" />
 </head>
 <body>
   <main>
-    <h1>Zen Cleaner — Réglages</h1>
+    <h1>Zen Cleaner — Settings</h1>
 
     <section>
-      <h2>Seuil d'inactivité</h2>
+      <h2>Inactivity threshold</h2>
       <p class="hint">
-        Un onglet non épinglé est fermé s'il n'a pas été visité depuis cette durée.
-        Les onglets actifs, épinglés, les Essentials et les onglets qui jouent du son
-        ne sont jamais fermés.
+        An unpinned tab is closed if it hasn't been visited for this long.
+        Active tabs, pinned tabs, Essentials and tabs playing audio are
+        never closed.
       </p>
       <div class="threshold-controls">
         <input type="number" id="threshold" min="0.05" step="0.05" />
-        <span>heures</span>
+        <span>hours</span>
         <div class="presets">
           <button data-hours="1">1 h</button>
           <button data-hours="6">6 h</button>
@@ -29,16 +29,16 @@
     </section>
 
     <section>
-      <h2>Domaines exclus</h2>
+      <h2>Excluded domains</h2>
       <p class="hint">
-        Un domaine par ligne (ex. <code>gmail.com</code>). Les onglets de ces domaines
-        et de leurs sous-domaines ne sont jamais fermés.
+        One domain per line (e.g. <code>gmail.com</code>). Tabs on these
+        domains and their subdomains are never closed.
       </p>
       <textarea id="excluded-domains" rows="8" spellcheck="false"
         placeholder="gmail.com&#10;github.com"></textarea>
     </section>
 
-    <p class="saved" id="saved-indicator" hidden>Enregistré ✓</p>
+    <p class="saved" id="saved-indicator" hidden>Saved ✓</p>
   </main>
 
   <script src="options.js"></script>

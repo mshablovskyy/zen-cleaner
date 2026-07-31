@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Zen Cleaner",
-  "version": "1.0.0",
-  "description": "Ferme automatiquement les onglets non épinglés inactifs depuis X heures, comme la fonctionnalité d'auto-archivage d'Arc.",
+  "version": "1.0.1",
+  "description": "Automatically closes unpinned tabs inactive for a configurable number of hours, like Arc's auto-archive feature.",
   "browser_specific_settings": {
     "gecko": {
       "id": "zen-cleaner@qskkk",

@@ -28,8 +28,8 @@ function isExcluded(url, excludedDomains) {
   });
 }
 
-// manual === true : déclenché depuis le popup — ignore le seuil d'inactivité
-// et le mode pause, mais respecte toujours épinglés/actifs/audibles/exclusions.
+// manual === true: triggered from the popup — bypasses the inactivity
+// threshold and pause mode, but still spares pinned/active/audible/excluded tabs.
 async function cleanTabs(manual = false) {
   const settings = await getSettings();
   if (!settings.enabled && !manual) {
@@ -44,7 +44,7 @@ async function cleanTabs(manual = false) {
     if (tab.pinned || tab.active || tab.audible) return false;
     if (isExcluded(tab.url, settings.excludedDomains)) return false;
     if (!manual) {
-      // lastAccessed absent = onglet dont on ne peut pas juger l'inactivité : on le garde.
+      // No lastAccessed = inactivity cannot be judged: keep the tab.
       if (typeof tab.lastAccessed !== "number") return false;
       if (now - tab.lastAccessed <= thresholdMs) return false;
     }
@@ -70,8 +70,8 @@ async function cleanTabs(manual = false) {
     title: "Zen Cleaner",
     message:
       toClose.length === 1
-        ? "1 onglet inactif fermé — cliquez pour le restaurer."
-        : `${toClose.length} onglets inactifs fermés — cliquez pour les restaurer.`,
+        ? "1 inactive tab closed — click to restore it."
+        : `${toClose.length} inactive tabs closed — click to restore them.`,
   });
 
   return toClose.length;
@@ -89,7 +89,7 @@ async function restoreLastCleanup() {
       await browser.tabs.create({ url: tab.url, active: false });
       restored++;
     } catch {
-      // URL privilégiée (about:, chrome:, file:) — impossible à rouvrir depuis une extension.
+      // Privileged URL (about:, chrome:, file:) — extensions cannot reopen it.
     }
   }
 

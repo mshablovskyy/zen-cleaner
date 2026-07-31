@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <link rel="stylesheet" href="popup.css" />
@@ -11,21 +11,21 @@
   </header>
 
   <label class="row toggle-row">
-    <span>Nettoyage automatique</span>
+    <span>Automatic cleanup</span>
     <input type="checkbox" id="enabled" class="switch" />
   </label>
 
   <p class="hint" id="threshold-hint"></p>
 
-  <button id="clean-now">Nettoyer maintenant</button>
+  <button id="clean-now">Clean now</button>
 
   <div class="row" id="last-cleanup" hidden>
     <span id="last-cleanup-label"></span>
-    <button id="restore" class="link-button">Restaurer</button>
+    <button id="restore" class="link-button">Restore</button>
   </div>
 
   <footer>
-    <button id="open-options" class="link-button">Réglages…</button>
+    <button id="open-options" class="link-button">Settings…</button>
   </footer>
 
   <script src="popup.js"></script>

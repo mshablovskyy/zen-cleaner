@@ -28,21 +28,21 @@ function renderLastCleanup(lastCleanup) {
     return;
   }
   const count = lastCleanup.tabs.length;
-  const time = new Date(lastCleanup.timestamp).toLocaleTimeString("fr-FR", {
+  const time = new Date(lastCleanup.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
   lastCleanupLabel.textContent =
     count === 1
-      ? `1 onglet fermé à ${time}`
-      : `${count} onglets fermés à ${time}`;
+      ? `1 tab closed at ${time}`
+      : `${count} tabs closed at ${time}`;
   lastCleanupRow.hidden = false;
 }
 
 async function refresh() {
   const settings = await browser.storage.local.get(DEFAULTS);
   enabledInput.checked = settings.enabled;
-  thresholdHint.textContent = `Ferme les onglets non épinglés inactifs depuis ${formatThreshold(settings.thresholdHours)}.`;
+  thresholdHint.textContent = `Closes unpinned tabs inactive for ${formatThreshold(settings.thresholdHours)}.`;
   renderLastCleanup(settings.lastCleanup);
 }
 
@@ -54,11 +54,11 @@ let confirmPending = false;
 cleanNowButton.addEventListener("click", async () => {
   if (!confirmPending) {
     confirmPending = true;
-    cleanNowButton.textContent = "Confirmer ?";
+    cleanNowButton.textContent = "Confirm?";
     cleanNowButton.classList.add("danger");
     setTimeout(() => {
       confirmPending = false;
-      cleanNowButton.textContent = "Nettoyer maintenant";
+      cleanNowButton.textContent = "Clean now";
       cleanNowButton.classList.remove("danger");
     }, 3000);
     return;
@@ -70,12 +70,12 @@ cleanNowButton.addEventListener("click", async () => {
   cleanNowButton.classList.remove("danger");
   cleanNowButton.textContent =
     response.closed === 0
-      ? "Rien à fermer"
+      ? "Nothing to close"
       : response.closed === 1
-        ? "1 onglet fermé"
-        : `${response.closed} onglets fermés`;
+        ? "1 tab closed"
+        : `${response.closed} tabs closed`;
   setTimeout(() => {
-    cleanNowButton.textContent = "Nettoyer maintenant";
+    cleanNowButton.textContent = "Clean now";
   }, 2000);
   refresh();
 });
