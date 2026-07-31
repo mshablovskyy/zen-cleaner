@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Zen Cleaner",
+  "version": "1.0.0",
+  "description": "Ferme automatiquement les onglets non épinglés inactifs depuis X heures, comme la fonctionnalité d'auto-archivage d'Arc.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "zen-cleaner@qskkk",
+      "strict_min_version": "115.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": ["tabs", "storage", "alarms", "notifications"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": "icons/icon.svg",
+    "default_title": "Zen Cleaner"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  }
+}

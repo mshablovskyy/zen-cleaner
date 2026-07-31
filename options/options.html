@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Zen Cleaner — Réglages</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <main>
+    <h1>Zen Cleaner — Réglages</h1>
+
+    <section>
+      <h2>Seuil d'inactivité</h2>
+      <p class="hint">
+        Un onglet non épinglé est fermé s'il n'a pas été visité depuis cette durée.
+        Les onglets actifs, épinglés, les Essentials et les onglets qui jouent du son
+        ne sont jamais fermés.
+      </p>
+      <div class="threshold-controls">
+        <input type="number" id="threshold" min="0.05" step="0.05" />
+        <span>heures</span>
+        <div class="presets">
+          <button data-hours="1">1 h</button>
+          <button data-hours="6">6 h</button>
+          <button data-hours="12">12 h</button>
+          <button data-hours="24">24 h</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Domaines exclus</h2>
+      <p class="hint">
+        Un domaine par ligne (ex. <code>gmail.com</code>). Les onglets de ces domaines
+        et de leurs sous-domaines ne sont jamais fermés.
+      </p>
+      <textarea id="excluded-domains" rows="8" spellcheck="false"
+        placeholder="gmail.com&#10;github.com"></textarea>
+    </section>
+
+    <p class="saved" id="saved-indicator" hidden>Enregistré ✓</p>
+  </main>
+
+  <script src="options.js"></script>
+</body>
+</html>
