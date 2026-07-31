@@ -11,8 +11,21 @@
 
 ## Mises à jour
 
-Bump `version` dans `manifest.json` → `npx web-ext build` → page développeur AMO
-→ « Upload New Version ».
+⚠️ « Submit a New Add-on » ne sert qu'à la toute première soumission — le
+réutiliser provoque une erreur « Duplicate add-on ID found », car l'ID
+`zen-cleaner@qskkk` est déjà enregistré.
+
+Pour toute nouvelle version : bump `version` dans `manifest.json` →
+`npx web-ext build` → https://addons.mozilla.org/developers/addons →
+ouvrir l'add-on → **« Upload New Version »** → uploader le zip.
+
+Alternative en ligne de commande (clés API sur
+https://addons.mozilla.org/developers/addon/api/key/) :
+
+```sh
+npx web-ext sign --channel=listed \
+  --api-key="$AMO_JWT_ISSUER" --api-secret="$AMO_JWT_SECRET"
+```
 
 ## Textes prêts à coller
 
