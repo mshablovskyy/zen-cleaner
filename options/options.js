@@ -1,10 +1,5 @@
 "use strict";
 
-const DEFAULTS = {
-  thresholdHours: 12,
-  excludedDomains: [],
-};
-
 const thresholdInput = document.getElementById("threshold");
 const domainsTextarea = document.getElementById("excluded-domains");
 const savedIndicator = document.getElementById("saved-indicator");

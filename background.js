@@ -4,13 +4,6 @@ const ALARM_NAME = "zen-cleaner-check";
 const CHECK_PERIOD_MINUTES = 15;
 const NOTIFICATION_ID = "zen-cleaner-cleanup";
 
-const DEFAULTS = {
-  enabled: true,
-  thresholdHours: 12,
-  excludedDomains: [],
-  lastCleanup: null,
-};
-
 async function getSettings() {
   return browser.storage.local.get(DEFAULTS);
 }
@@ -51,30 +44,40 @@ async function cleanTabs(manual = false) {
     return true;
   });
 
-  if (toClose.length === 0) {
+  // Close tabs one by one: a tab closed by the user in the meantime must not
+  // abort the whole cleanup, and lastCleanup must only list actually closed tabs.
+  const closedTabs = [];
+  for (const tab of toClose) {
+    try {
+      await browser.tabs.remove(tab.id);
+      closedTabs.push({ url: tab.url, title: tab.title });
+    } catch {
+      // Tab already gone.
+    }
+  }
+
+  if (closedTabs.length === 0) {
     return 0;
   }
 
   await browser.storage.local.set({
     lastCleanup: {
       timestamp: now,
-      tabs: toClose.map((tab) => ({ url: tab.url, title: tab.title })),
+      tabs: closedTabs,
     },
   });
 
-  await browser.tabs.remove(toClose.map((tab) => tab.id));
-
   await browser.notifications.create(NOTIFICATION_ID, {
     type: "basic",
-    iconUrl: browser.runtime.getURL("icons/icon.svg"),
+    iconUrl: browser.runtime.getURL("icons/icon-96.png"),
     title: "Zen Tabs Cleaner",
     message:
-      toClose.length === 1
+      closedTabs.length === 1
         ? "1 inactive tab closed — click to restore it."
-        : `${toClose.length} inactive tabs closed — click to restore them.`,
+        : `${closedTabs.length} inactive tabs closed — click to restore them.`,
   });
 
-  return toClose.length;
+  return closedTabs.length;
 }
 
 async function restoreLastCleanup() {
@@ -106,7 +109,7 @@ browser.runtime.onStartup.addListener(ensureAlarm);
 
 browser.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM_NAME) {
-    cleanTabs(false);
+    cleanTabs(false).catch(console.error);
   }
 });
 

@@ -1,12 +1,5 @@
 "use strict";
 
-const DEFAULTS = {
-  enabled: true,
-  thresholdHours: 12,
-  excludedDomains: [],
-  lastCleanup: null,
-};
-
 const enabledInput = document.getElementById("enabled");
 const thresholdHint = document.getElementById("threshold-hint");
 const cleanNowButton = document.getElementById("clean-now");
