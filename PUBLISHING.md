@@ -1,48 +1,44 @@
-# Publier sur addons.mozilla.org (AMO)
+# Publishing on addons.mozilla.org (AMO)
 
-## Étapes
+## First submission
 
-1. Se connecter / créer un compte : https://addons.mozilla.org/developers/
-2. « Submit a New Add-on » → canal **On this site** (listed)
-3. Uploader `web-ext-artifacts/zen_cleaner-<version>.zip` (générer avec `npx web-ext build`)
-4. À la question du code source : répondre **No** (aucun build/minification, le zip est le source)
-5. Remplir la fiche avec les textes ci-dessous
-6. Soumettre — signature automatique immédiate, revue humaine a posteriori
+1. Sign in / create an account: https://addons.mozilla.org/developers/
+2. "Submit a New Add-on" → **On this site** (listed) channel
+3. Upload `web-ext-artifacts/zen_cleaner-<version>.zip` (build with `npx web-ext build`)
+4. When asked about source code: answer **No** (no build/minification, the zip
+   is the source)
+5. Fill in the listing with the texts below
+6. Submit — automatic signing is immediate, human review happens afterwards
 
-## Mises à jour
+## Updates
 
-⚠️ « Submit a New Add-on » ne sert qu'à la toute première soumission — le
-réutiliser provoque une erreur « Duplicate add-on ID found », car l'ID
-`zen-cleaner@qskkk` est déjà enregistré.
+⚠️ "Submit a New Add-on" is only for the very first submission — reusing it
+fails with "Duplicate add-on ID found", because the `zen-cleaner@qskkk` ID is
+already registered.
 
-Pour toute nouvelle version : bump `version` dans `manifest.json` →
+For every new version: bump `version` in `manifest.json` →
 `npx web-ext build` → https://addons.mozilla.org/developers/addons →
-ouvrir l'add-on → **« Upload New Version »** → uploader le zip.
+open the add-on → **"Upload New Version"** → upload the zip.
 
-Alternative en ligne de commande (clés API sur
-https://addons.mozilla.org/developers/addon/api/key/) :
+Command-line alternative (API keys at
+https://addons.mozilla.org/developers/addon/api/key/):
 
 ```sh
 npx web-ext sign --channel=listed \
   --api-key="$AMO_JWT_ISSUER" --api-secret="$AMO_JWT_SECRET"
 ```
 
-## Textes prêts à coller
+## Ready-to-paste listing texts
 
 ### Name
 Zen Cleaner
 
-### Summary (EN, max 250 caractères)
+### Summary (max 250 characters)
 Automatically closes unpinned tabs that have been inactive for a set number
 of hours, like Arc's auto-archive. Pinned tabs, Essentials, audible tabs and
 excluded domains are never touched. One-click restore after each cleanup.
 
-### Summary (FR)
-Ferme automatiquement les onglets non épinglés inactifs depuis X heures,
-comme l'auto-archivage d'Arc. Onglets épinglés, Essentials, onglets audio et
-domaines exclus ne sont jamais touchés. Restauration en un clic.
-
-### Description (EN)
+### Description
 Zen Cleaner brings Arc's auto-archive to Zen Browser and Firefox.
 
 Every 15 minutes, it closes tabs that meet ALL of these conditions:
@@ -66,45 +62,17 @@ Extras:
 No data collection, no external requests. Open source (MIT):
 https://github.com/qskkk/zen-cleaner
 
-### Description (FR)
-Zen Cleaner apporte l'auto-archivage d'Arc à Zen Browser et Firefox.
+### Listing fields
 
-Toutes les 15 minutes, il ferme les onglets qui remplissent TOUTES ces
-conditions :
-• non épinglé (les onglets épinglés et les Essentials de Zen ne sont jamais
-  touchés)
-• pas l'onglet actif d'une fenêtre
-• ne joue pas de son (musique, visio…)
-• pas sur un domaine de votre liste d'exclusion
-• inactif depuis plus que le seuil configuré (12 h par défaut)
-
-Les onglets cachés dans les autres workspaces Zen sont aussi nettoyés, comme
-les spaces d'Arc.
-
-Après chaque nettoyage, une notification indique le nombre d'onglets fermés —
-cliquez dessus pour tout restaurer. La restauration est aussi disponible dans
-le popup.
-
-En bonus :
-• Bouton « Nettoyer maintenant » dans le popup (avec confirmation)
-• Pause temporaire du nettoyage
-• Seuil configurable avec préréglages 1 h / 6 h / 12 h / 24 h
-• Liste d'exclusion de domaines (sous-domaines inclus)
-
-Aucune collecte de données, aucune requête externe. Open source (MIT) :
-https://github.com/qskkk/zen-cleaner
-
-### Champs de la fiche
-
-- **Categories** : Tabs
-- **License** : MIT
-- **Homepage / Support site** : https://github.com/qskkk/zen-cleaner
-- **Privacy policy** : This extension does not collect, store or transmit any
+- **Categories**: Tabs
+- **License**: MIT
+- **Homepage / Support site**: https://github.com/qskkk/zen-cleaner
+- **Privacy policy**: This extension does not collect, store or transmit any
   data. All settings stay in your browser's local storage.
-- **Notes to reviewer** (optionnel) : Plain vanilla JavaScript, no build step —
+- **Notes to reviewer** (optional): Plain vanilla JavaScript, no build step —
   the uploaded zip is the complete source code.
 
-### Captures d'écran (recommandé)
+### Screenshots (recommended)
 
-Faire 2-3 captures : le popup, la page de réglages, une notification de
-nettoyage. AMO accepte PNG/JPG, idéalement 1280×800 ou proportion similaire.
+Take 2-3 screenshots: the popup, the settings page, a cleanup notification.
+AMO accepts PNG/JPG, ideally 1280×800 or a similar ratio.

@@ -1,60 +1,65 @@
 # Zen Cleaner
 
-Extension pour [Zen Browser](https://zen-browser.app) qui reproduit l'auto-archivage d'Arc :
-les onglets **non épinglés** inactifs depuis **X heures** (réglable) sont fermés automatiquement.
+Extension for [Zen Browser](https://zen-browser.app) that brings Arc's
+auto-archive feature: **unpinned** tabs inactive for **X hours** (configurable)
+are closed automatically.
 
-## Fonctionnement
+## How it works
 
-Toutes les 15 minutes, l'extension vérifie chaque onglet et ferme ceux qui remplissent
-**toutes** ces conditions :
+Every 15 minutes, the extension checks each tab and closes those that meet
+**all** of these conditions:
 
-- non épinglé (les onglets épinglés et les **Essentials** de Zen ne sont jamais touchés) ;
-- pas l'onglet actif d'une fenêtre ;
-- ne joue pas de son (musique, visio…) ;
-- pas sur un domaine de la liste d'exclusion ;
-- inactif depuis plus que le seuil configuré (12 h par défaut).
+- not pinned (pinned tabs and Zen **Essentials** are never touched);
+- not the active tab of a window;
+- not playing audio (music, video calls…);
+- not on a domain from the exclusion list;
+- inactive for longer than the configured threshold (12 hours by default).
 
-Les onglets des **autres workspaces Zen** sont aussi nettoyés (comme les spaces d'Arc).
+Tabs in **other Zen workspaces** are cleaned too (like Arc's spaces).
 
-Après chaque nettoyage, une notification indique le nombre d'onglets fermés —
-**cliquer dessus les restaure**. La restauration est aussi disponible dans le popup.
+After each cleanup, a notification shows how many tabs were closed —
+**clicking it restores them**. Restore is also available from the popup.
 
-> Limitation : les onglets restaurés se rouvrent dans le workspace courant,
-> l'API WebExtensions ne permettant pas de cibler un workspace Zen.
+> Limitation: restored tabs reopen in the current workspace, as the
+> WebExtensions API cannot target a specific Zen workspace.
 
-## Utilisation
+## Usage
 
-- **Popup** (icône dans la barre d'outils) : pause/reprise du nettoyage automatique,
-  bouton « Nettoyer maintenant » (ferme tous les onglets non épinglés/actifs/audibles,
-  sans attendre le seuil), restauration du dernier nettoyage, accès aux réglages.
-- **Réglages** : seuil d'inactivité en heures (préréglages 1 h / 6 h / 12 h / 24 h,
-  décimales acceptées — `0.05` ≈ 3 min, pratique pour tester) et liste de domaines exclus
-  (un par ligne, sous-domaines inclus).
+- **Popup** (toolbar icon): pause/resume automatic cleanup, "Clean now" button
+  (closes every unpinned/inactive/non-audible tab without waiting for the
+  threshold), restore the last cleanup, open settings.
+- **Settings**: inactivity threshold in hours (1 h / 6 h / 12 h / 24 h presets,
+  decimals accepted — `0.05` ≈ 3 min, handy for testing) and excluded domains
+  list (one per line, subdomains included).
 
-## Installation dans Zen
+## Installing in Zen
 
-### Pour le développement (temporaire, perdu au redémarrage)
+### For development (temporary, lost on restart)
 
-1. Ouvrir `about:debugging#/runtime/this-firefox`
-2. « Charger un module complémentaire temporaire… »
-3. Sélectionner `manifest.json`
+1. Open `about:debugging#/runtime/this-firefox`
+2. "Load Temporary Add-on…"
+3. Select `manifest.json`
 
-### Installation permanente
+### Permanent install
 
-Deux options :
+Two options:
 
-1. **Désactiver l'exigence de signature** (possible dans Zen, contrairement à Firefox
-   release) : dans `about:config`, passer `xpinstall.signatures.required` à `false`,
-   puis zipper le dossier (`zip -r zen-cleaner.xpi . -x ".*"`) et l'ouvrir dans Zen.
-2. **Signer via AMO** : `npx web-ext sign --channel=unlisted` avec des
-   [clés API addons.mozilla.org](https://addons.mozilla.org/developers/addon/api/key/),
-   puis installer le `.xpi` signé.
+1. **Disable signature enforcement** (possible in Zen, unlike Firefox release):
+   in `about:config`, set `xpinstall.signatures.required` to `false`, then zip
+   the folder (`zip -r zen-cleaner.xpi . -x ".*"`) and open it in Zen.
+2. **Sign through AMO**: `npx web-ext sign --channel=unlisted` with
+   [addons.mozilla.org API keys](https://addons.mozilla.org/developers/addon/api/key/),
+   then install the signed `.xpi`.
 
-## Développement
+## Development
 
-Aucun build : le code est du JavaScript vanilla (Manifest V3, event page Firefox).
+No build step: plain vanilla JavaScript (Manifest V3, Firefox event page).
 
 ```sh
-npx web-ext lint    # valider le manifest et les APIs
-npx web-ext run     # lancer dans un Firefox de test
+npx web-ext lint    # validate manifest and APIs
+npx web-ext run     # run in a test Firefox profile
 ```
+
+## License
+
+[MIT](LICENSE)
