@@ -1,10 +1,12 @@
 # Zen Tabs Cleaner
 
-Zen-only fork of [qskkk/zen-cleaner](https://github.com/qskkk/zen-cleaner), the
-Arc-style auto-archive extension. Set an inactivity threshold for each Zen
-space, or turn automatic cleanup off for selected spaces.
-This version uses Zen's privileged Experiment API; it cannot be installed from
-AMO or used in regular Firefox.
+Extension for [Zen Browser](https://zen-browser.app) that brings Arc's
+auto-archive feature: **unpinned** tabs inactive for **X hours** are closed
+automatically, with a separate threshold for each Zen space (or no automatic
+cleanup at all in the spaces you choose).
+
+It reads Zen spaces through a privileged Firefox Experiment API, so it runs only
+in Zen and is installed from file rather than from AMO.
 
 ## How it works
 
@@ -49,7 +51,7 @@ is not signed by Mozilla and cannot be distributed through AMO.
 2. For a persistent install, set `xpinstall.signatures.required` to `false`
    and `extensions.autoDisableScopes` to `14`.
 3. Restart Zen, open `about:addons`, choose **Install Add-on From File…**, and
-   select the provided XPI.
+   select the XPI built as described under [Development](#development).
 
 To load it temporarily while developing, use `about:debugging#/runtime/this-firefox`
 and choose **Load Temporary Add-on…**. The temporary install is removed when Zen
