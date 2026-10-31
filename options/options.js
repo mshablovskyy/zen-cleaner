@@ -4,8 +4,11 @@ const thresholdInput = document.getElementById("threshold");
 const checkPeriodInput = document.getElementById("check-period");
 const domainsTextarea = document.getElementById("excluded-domains");
 const savedIndicator = document.getElementById("saved-indicator");
+const spaceRulesContainer = document.getElementById("space-rules");
+const spaceApiWarning = document.getElementById("space-api-warning");
 const thresholdPresets = document.querySelectorAll("#threshold-presets button");
 const periodPresets = document.querySelectorAll("#period-presets button");
+let workspaceRules = {};
 
 let savedTimeout;
 function showSaved() {
@@ -21,6 +24,78 @@ async function load() {
   thresholdInput.value = settings.thresholdHours;
   checkPeriodInput.value = settings.checkPeriodMinutes;
   domainsTextarea.value = settings.excludedDomains.join("\n");
+  workspaceRules = settings.workspaceRules || {};
+
+  try {
+    const spaces = await browser.zenCleaner.getSpaces();
+    renderSpaceRules(spaces, settings.thresholdHours);
+  } catch {
+    spaceRulesContainer.hidden = true;
+    spaceApiWarning.hidden = false;
+  }
+}
+
+function saveWorkspaceRule(id, patch) {
+  workspaceRules = {
+    ...workspaceRules,
+    [id]: { ...(workspaceRules[id] || {}), ...patch },
+  };
+  browser.storage.local.set({ workspaceRules }).then(showSaved);
+}
+
+function renderSpaceRules(spaces, defaultHours) {
+  spaceRulesContainer.replaceChildren();
+  if (!spaces.length) {
+    spaceRulesContainer.textContent = "No Zen spaces found.";
+    return;
+  }
+
+  spaces.forEach((space) => {
+    const rule = workspaceRules[space.id] || {};
+    const row = document.createElement("div");
+    row.className = "space-rule";
+
+    const name = document.createElement("strong");
+    name.textContent = space.name || "Space";
+
+    const enabledLabel = document.createElement("label");
+    enabledLabel.className = "space-enabled";
+    const enabled = document.createElement("input");
+    enabled.type = "checkbox";
+    enabled.checked = rule.enabled !== false;
+    const enabledText = document.createElement("span");
+    enabledText.textContent = "Automatic cleanup";
+    enabledLabel.append(enabled, enabledText);
+
+    const thresholdLabel = document.createElement("label");
+    thresholdLabel.className = "space-threshold";
+    thresholdLabel.append(document.createTextNode("Close inactive tabs after"));
+    const hours = document.createElement("input");
+    hours.type = "number";
+    hours.min = "0.05";
+    hours.step = "0.05";
+    hours.value = rule.thresholdHours ?? defaultHours;
+    hours.disabled = !enabled.checked;
+    const unit = document.createElement("span");
+    unit.textContent = "hours";
+    thresholdLabel.append(hours, unit);
+
+    enabled.addEventListener("change", () => {
+      hours.disabled = !enabled.checked;
+      saveWorkspaceRule(space.id, { enabled: enabled.checked });
+    });
+    hours.addEventListener("change", () => {
+      const value = Number(hours.value);
+      if (!Number.isFinite(value) || value <= 0) {
+        hours.value = workspaceRules[space.id]?.thresholdHours ?? defaultHours;
+        return;
+      }
+      saveWorkspaceRule(space.id, { thresholdHours: value });
+    });
+
+    row.append(name, enabledLabel, thresholdLabel);
+    spaceRulesContainer.append(row);
+  });
 }
 
 function saveThreshold(hours) {

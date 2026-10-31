@@ -1,0 +1,74 @@
+[
+  {
+    "namespace": "zenCleaner",
+    "description": "Access Zen workspace and tab state for the personal Zen-only build.",
+    "functions": [
+      {
+        "name": "getSpaces",
+        "type": "function",
+        "async": true,
+        "parameters": [],
+        "returns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" }
+            }
+          }
+        }
+      },
+      {
+        "name": "getActiveSpaceId",
+        "type": "function",
+        "async": true,
+        "parameters": [],
+        "returns": { "type": "string" }
+      },
+      {
+        "name": "getTabs",
+        "type": "function",
+        "async": true,
+        "parameters": [],
+        "returns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "spaceId": { "type": "string" },
+              "spaceName": { "type": "string" },
+              "title": { "type": "string" },
+              "url": { "type": "string" },
+              "lastAccessed": { "type": "number" },
+              "pinned": { "type": "boolean" },
+              "active": { "type": "boolean" },
+              "audible": { "type": "boolean" },
+              "hidden": { "type": "boolean" }
+            }
+          }
+        }
+      },
+      {
+        "name": "closeTab",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "tabId", "type": "integer" }
+        ],
+        "returns": { "type": "boolean" }
+      },
+      {
+        "name": "moveTabToSpace",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "tabId", "type": "integer" },
+          { "name": "spaceId", "type": "string" }
+        ],
+        "returns": { "type": "boolean" }
+      }
+    ]
+  }
+]

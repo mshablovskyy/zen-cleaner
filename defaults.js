@@ -6,5 +6,6 @@ const DEFAULTS = {
   thresholdHours: 12,
   checkPeriodMinutes: 15,
   excludedDomains: [],
+  workspaceRules: {},
   lastCleanup: null,
 };
