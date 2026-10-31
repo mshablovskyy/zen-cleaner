@@ -36,16 +36,23 @@ function renderLastCleanup(lastCleanup) {
 async function refresh() {
   const settings = await browser.storage.local.get(DEFAULTS);
   enabledInput.checked = settings.enabled;
-  thresholdHint.textContent = `Closes unpinned tabs inactive for ${formatThreshold(settings.thresholdHours)}.`;
   renderLastCleanup(settings.lastCleanup);
 
   const stats = await browser.runtime.sendMessage({ type: "getStats" });
+  const spaceLabel = stats.spaceName ? ` in ${stats.spaceName}` : "";
+  thresholdHint.textContent =
+    `Closes unpinned tabs inactive for ${formatThreshold(stats.thresholdHours ?? settings.thresholdHours)}${spaceLabel}.`;
   let text = `Watching ${stats.total} tabs`;
   if (stats.hidden > 0) {
     text += ` (${stats.hidden} hidden)`;
   }
   if (stats.eligible > 0) {
     text += ` — ${stats.eligible} overdue`;
+  }
+  if (!stats.globalEnabled) {
+    text += " — paused";
+  } else if (!stats.spaceEnabled) {
+    text += ` — cleanup off${spaceLabel}`;
   }
   statsLine.textContent = text + ".";
 }

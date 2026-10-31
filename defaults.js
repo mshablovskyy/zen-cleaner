@@ -7,5 +7,6 @@ const DEFAULTS = {
   checkPeriodMinutes: 15,
   excludedDomains: [],
   notifyOnCleanup: true,
+  workspaceRules: {},
   lastCleanup: null,
 };

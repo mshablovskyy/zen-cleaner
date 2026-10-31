@@ -20,23 +20,16 @@ function isExcluded(url, excludedDomains) {
   });
 }
 
-// Zen patches tabs.query in non-standard ways: the unfiltered path can fail or
-// drop hidden (other-workspace) tabs (zen-browser/desktop#11210, #12652).
-// Filtered queries still work, so query visible and hidden tabs separately.
-async function queryAllTabs() {
-  const tabs = [];
-  for (const filter of [{ hidden: false }, { hidden: true }]) {
-    try {
-      tabs.push(...(await browser.tabs.query(filter)));
-    } catch (error) {
-      console.error("[Zen Tabs Cleaner] tabs.query failed for", filter, error);
-    }
-  }
-  if (tabs.length === 0) {
-    tabs.push(...(await browser.tabs.query({})));
-  }
-  const seen = new Set();
-  return tabs.filter((tab) => !seen.has(tab.id) && seen.add(tab.id));
+function getSpaceRule(settings, spaceId) {
+  const rule = settings.workspaceRules?.[spaceId] || {};
+  const threshold = Number(rule.thresholdHours);
+  return {
+    enabled: rule.enabled !== false,
+    thresholdHours:
+      Number.isFinite(threshold) && threshold > 0
+        ? threshold
+        : settings.thresholdHours,
+  };
 }
 
 // Returns why a tab must be spared, or null if it can be closed.
@@ -47,7 +40,9 @@ function spareReason(tab, settings, now, thresholdMs, manual) {
   if (isExcluded(tab.url, settings.excludedDomains)) return "excluded";
   if (!manual) {
     // No lastAccessed = inactivity cannot be judged: keep the tab.
-    if (typeof tab.lastAccessed !== "number") return "no lastAccessed";
+    if (typeof tab.lastAccessed !== "number" || tab.lastAccessed <= 0) {
+      return "no lastAccessed";
+    }
     if (now - tab.lastAccessed <= thresholdMs) return "recent";
   }
   return null;
@@ -61,16 +56,23 @@ async function cleanTabs(manual = false, source = "alarm") {
     return 0;
   }
 
-  const thresholdMs = settings.thresholdHours * 3600 * 1000;
   const now = Date.now();
-  const tabs = await queryAllTabs();
+  const [tabs, activeSpaceId] = await Promise.all([
+    browser.zenCleaner.getTabs(),
+    browser.zenCleaner.getActiveSpaceId(),
+  ]);
 
   const toClose = [];
   const sparedReport = [];
   for (const tab of tabs) {
+    if (!tab.spaceId || (manual && tab.spaceId !== activeSpaceId)) continue;
+    const rule = getSpaceRule(settings, tab.spaceId);
+    if (!manual && !rule.enabled) continue;
+
+    const thresholdMs = rule.thresholdHours * 3600 * 1000;
     const reason = spareReason(tab, settings, now, thresholdMs, manual);
     if (reason === null) {
-      toClose.push(tab);
+      toClose.push({ ...tab, spaceName: tab.spaceName });
     } else {
       sparedReport.push({
         title: (tab.title || tab.url || "").slice(0, 50),
@@ -84,10 +86,9 @@ async function cleanTabs(manual = false, source = "alarm") {
     }
   }
 
-  const hiddenCount = tabs.filter((tab) => tab.hidden).length;
   console.debug(
     `[Zen Tabs Cleaner] ${manual ? "manual" : source} check: ` +
-      `${tabs.length} tabs seen (${hiddenCount} hidden), closing ${toClose.length}`,
+      `${tabs.length} tabs seen across spaces, closing ${toClose.length}`,
   );
   if (sparedReport.length > 0) {
     console.debug("[Zen Tabs Cleaner] spared tabs:", sparedReport);
@@ -98,8 +99,14 @@ async function cleanTabs(manual = false, source = "alarm") {
   const closedTabs = [];
   for (const tab of toClose) {
     try {
-      await browser.tabs.remove(tab.id);
-      closedTabs.push({ url: tab.url, title: tab.title });
+      if (await browser.zenCleaner.closeTab(tab.id)) {
+        closedTabs.push({
+          url: tab.url,
+          title: tab.title,
+          spaceId: tab.spaceId,
+          spaceName: tab.spaceName,
+        });
+      }
     } catch {
       // Tab already gone.
     }
@@ -140,7 +147,10 @@ async function restoreLastCleanup() {
   let restored = 0;
   for (const tab of lastCleanup.tabs) {
     try {
-      await browser.tabs.create({ url: tab.url, active: false });
+      const created = await browser.tabs.create({ url: tab.url, active: false });
+      if (tab.spaceId) {
+        await browser.zenCleaner.moveTabToSpace(created.id, tab.spaceId);
+      }
       restored++;
     } catch {
       // Privileged URL (about:, chrome:, file:) — extensions cannot reopen it.
@@ -166,10 +176,9 @@ browser.storage.onChanged.addListener((changes, area) => {
   }
 });
 
-// Zen only exposes the current space's tabs to extensions (no hidden tabs, no
-// separate windows), so overdue tabs in another space can only be cleaned once
-// that space becomes visible. Run an extra check whenever the user switches
-// tab or window — throttled just enough to not re-check on rapid tab hops.
+// The Zen Experiment API can see tabs in every space. Check on tab/window
+// activity as well as the alarm so a tab that becomes inactive is noticed soon.
+// Throttle rapid tab hops to avoid repeating the scan unnecessarily.
 const ACTIVITY_CHECK_THROTTLE_MS = 5 * 1000;
 let lastActivityCheck = 0;
 
@@ -200,15 +209,27 @@ browser.notifications.onClicked.addListener((notificationId) => {
 
 async function getStats() {
   const settings = await getSettings();
-  const thresholdMs = settings.thresholdHours * 3600 * 1000;
+  const [activeSpaceId, tabs, spaces] = await Promise.all([
+    browser.zenCleaner.getActiveSpaceId(),
+    browser.zenCleaner.getTabs(),
+    browser.zenCleaner.getSpaces(),
+  ]);
+  const spaceTabs = tabs.filter((tab) => tab.spaceId === activeSpaceId);
+  const rule = getSpaceRule(settings, activeSpaceId);
+  const thresholdMs = rule.thresholdHours * 3600 * 1000;
   const now = Date.now();
-  const tabs = await queryAllTabs();
   return {
-    total: tabs.length,
-    hidden: tabs.filter((tab) => tab.hidden).length,
+    total: spaceTabs.length,
+    hidden: spaceTabs.filter((tab) => tab.hidden).length,
     eligible: tabs.filter(
-      (tab) => spareReason(tab, settings, now, thresholdMs, false) === null,
+      (tab) =>
+        tab.spaceId === activeSpaceId &&
+        spareReason(tab, settings, now, thresholdMs, false) === null,
     ).length,
+    spaceName: spaces.find((space) => space.id === activeSpaceId)?.name || "",
+    thresholdHours: rule.thresholdHours,
+    globalEnabled: settings.enabled,
+    spaceEnabled: rule.enabled,
   };
 }
 

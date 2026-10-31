@@ -99,6 +99,55 @@ input[type="number"] {
   color: var(--accent);
 }
 
+.space-rules {
+  display: grid;
+  gap: 10px;
+}
+
+.space-rule {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.space-rule strong {
+  overflow-wrap: anywhere;
+}
+
+.space-enabled,
+.space-threshold {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.space-threshold {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+
+.space-enabled input {
+  accent-color: var(--accent);
+}
+
+.space-threshold input {
+  font: inherit;
+  width: 90px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.space-threshold input:disabled {
+  opacity: 0.55;
+}
+
 textarea {
   font: inherit;
   width: 100%;
