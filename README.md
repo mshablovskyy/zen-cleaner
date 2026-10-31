@@ -16,7 +16,8 @@ checks each tab and closes those that meet **all** of these conditions:
 - inactive for longer than the configured threshold (12 hours by default).
 
 After each cleanup, a notification shows how many tabs were closed —
-**clicking it restores them**. Restore is also available from the popup.
+**clicking it restores them**. Restore is also available from the popup, and
+notifications can be turned off in the settings.
 
 ### Zen workspaces (spaces)
 
@@ -37,8 +38,8 @@ moment you come back to it.
   threshold), restore the last cleanup, open settings.
 - **Settings**: inactivity threshold in hours (1 h / 6 h / 12 h / 24 h presets,
   decimals accepted — `0.05` ≈ 3 min, handy for testing), check frequency in
-  minutes (1 min minimum, 15 min default), and excluded domains list (one per
-  line, subdomains included).
+  minutes (1 min minimum, 15 min default), excluded domains list (one per
+  line, subdomains included), and a toggle for cleanup notifications.
 
 ## Installing in Zen
 

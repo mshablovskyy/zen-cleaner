@@ -55,7 +55,8 @@ spaces are cleaned as soon as you switch back to them — a check also runs on
 every space/tab/window switch, not just on the periodic schedule.
 
 After each cleanup, a notification tells you how many tabs were closed —
-click it to restore them all. You can also restore from the popup.
+click it to restore them all. You can also restore from the popup, and turn
+notifications off in the settings.
 
 Extras:
 • "Clean now" button in the popup (with confirmation)
@@ -63,6 +64,7 @@ Extras:
 • Configurable threshold with 1h / 6h / 12h / 24h presets
 • Configurable check frequency (1 minute minimum)
 • Domain exclusion list (subdomains included)
+• Optional cleanup notifications
 
 No data collection, no external requests. Open source (MIT):
 https://github.com/qskkk/zen-cleaner

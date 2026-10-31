@@ -3,6 +3,7 @@
 const thresholdInput = document.getElementById("threshold");
 const checkPeriodInput = document.getElementById("check-period");
 const domainsTextarea = document.getElementById("excluded-domains");
+const notifyInput = document.getElementById("notify-on-cleanup");
 const savedIndicator = document.getElementById("saved-indicator");
 const thresholdPresets = document.querySelectorAll("#threshold-presets button");
 const periodPresets = document.querySelectorAll("#period-presets button");
@@ -21,6 +22,7 @@ async function load() {
   thresholdInput.value = settings.thresholdHours;
   checkPeriodInput.value = settings.checkPeriodMinutes;
   domainsTextarea.value = settings.excludedDomains.join("\n");
+  notifyInput.checked = settings.notifyOnCleanup;
 }
 
 function saveThreshold(hours) {
@@ -63,6 +65,12 @@ domainsTextarea.addEventListener("change", () => {
     .map((line) => line.trim().toLowerCase())
     .filter(Boolean);
   browser.storage.local.set({ excludedDomains }).then(showSaved);
+});
+
+notifyInput.addEventListener("change", () => {
+  browser.storage.local
+    .set({ notifyOnCleanup: notifyInput.checked })
+    .then(showSaved);
 });
 
 load();

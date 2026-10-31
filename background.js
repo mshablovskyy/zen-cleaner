@@ -116,15 +116,17 @@ async function cleanTabs(manual = false, source = "alarm") {
     },
   });
 
-  await browser.notifications.create(NOTIFICATION_ID, {
-    type: "basic",
-    iconUrl: browser.runtime.getURL("icons/icon-96.png"),
-    title: "Zen Tabs Cleaner",
-    message:
-      closedTabs.length === 1
-        ? "1 inactive tab closed — click to restore it."
-        : `${closedTabs.length} inactive tabs closed — click to restore them.`,
-  });
+  if (settings.notifyOnCleanup) {
+    await browser.notifications.create(NOTIFICATION_ID, {
+      type: "basic",
+      iconUrl: browser.runtime.getURL("icons/icon-96.png"),
+      title: "Zen Tabs Cleaner",
+      message:
+        closedTabs.length === 1
+          ? "1 inactive tab closed — click to restore it."
+          : `${closedTabs.length} inactive tabs closed — click to restore them.`,
+    });
+  }
 
   return closedTabs.length;
 }
