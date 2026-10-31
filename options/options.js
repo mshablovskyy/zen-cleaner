@@ -3,6 +3,7 @@
 const thresholdInput = document.getElementById("threshold");
 const checkPeriodInput = document.getElementById("check-period");
 const domainsTextarea = document.getElementById("excluded-domains");
+const notifyInput = document.getElementById("notify-on-cleanup");
 const savedIndicator = document.getElementById("saved-indicator");
 const spaceRulesContainer = document.getElementById("space-rules");
 const spaceApiWarning = document.getElementById("space-api-warning");
@@ -24,6 +25,7 @@ async function load() {
   thresholdInput.value = settings.thresholdHours;
   checkPeriodInput.value = settings.checkPeriodMinutes;
   domainsTextarea.value = settings.excludedDomains.join("\n");
+  notifyInput.checked = settings.notifyOnCleanup;
   workspaceRules = settings.workspaceRules || {};
 
   try {
@@ -138,6 +140,12 @@ domainsTextarea.addEventListener("change", () => {
     .map((line) => line.trim().toLowerCase())
     .filter(Boolean);
   browser.storage.local.set({ excludedDomains }).then(showSaved);
+});
+
+notifyInput.addEventListener("change", () => {
+  browser.storage.local
+    .set({ notifyOnCleanup: notifyInput.checked })
+    .then(showSaved);
 });
 
 load();
